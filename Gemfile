@@ -11,4 +11,5 @@ gem "sinatra-contrib"
 group :development, :test do
   gem "rspec"
   gem "rack-test", require: "rack/test"
+  gem "codeclimate-test-reporter", require: false
 end
