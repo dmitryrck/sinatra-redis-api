@@ -28,7 +28,7 @@ module Api
                 []
               end
 
-      json items
+      json items.reject { |item| item.nil? }
     end
 
     put "/lists/:list_uuid/todos/:todo_uuid" do

@@ -11,15 +11,27 @@ describe Api::Application do
     end
 
     it "should return its items" do
-      redis.set("list-1234", %[[1234, 5678]])
-      redis.set("todo-1234", JSON.dump(uuid: 1, description: "item#1", done: false))
-      redis.set("todo-5678", JSON.dump(uuid: 2, description: "item#2", done: true))
+      redis.set("list-1234", %[[1, 2]])
+      redis.set("todo-1", JSON.dump(uuid: 1, description: "item#1", done: false))
+      redis.set("todo-2", JSON.dump(uuid: 2, description: "item#2", done: true))
 
       get "/lists/1234/todos"
 
       expect(JSON.parse(last_response.body)).to match_array([
         { "uuid" => 1, "description" => "item#1", "done" => false },
         { "uuid" => 2, "description" => "item#2", "done" => true },
+      ])
+    end
+
+    it "should not return deleted items" do
+      redis.set("list-1234", %[[10, 20]])
+      redis.del("todo-10")
+      redis.set("todo-20", JSON.dump(uuid: 20, description: "item#2", done: true))
+
+      get "/lists/1234/todos"
+
+      expect(JSON.parse(last_response.body)).to match_array([
+        { "uuid" => 20, "description" => "item#2", "done" => true },
       ])
     end
   end
