@@ -20,7 +20,9 @@ module Api
       list = list_uuid(params)
       items = if redis.exists(list)
                 JSON.parse(redis.get(list)).map do |item_uuid|
-                  JSON.parse(redis.get("todo-#{item_uuid}"))
+                  if redis.exists("todo-#{item_uuid}")
+                    JSON.parse(redis.get("todo-#{item_uuid}"))
+                  end
                 end
               else
                 []
