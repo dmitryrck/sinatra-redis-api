@@ -2,9 +2,11 @@
 
 source "https://rubygems.org"
 
+gem "puma"
+gem "rack-contrib"
+gem "redis"
 gem "sinatra"
 gem "sinatra-contrib"
-gem "redis"
 
 group :development, :test do
   gem "rspec"

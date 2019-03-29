@@ -7,13 +7,5 @@ describe Api::Application do
 
       expect(last_response.status).to eq 200
     end
-
-    it "should return correct redis key" do
-      Api.redis.set("mykey", "this value")
-
-      get "/"
-
-      expect(JSON.parse(last_response.body)).to eq("mykey" => "this value")
-    end
   end
 end

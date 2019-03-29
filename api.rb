@@ -1,26 +1,41 @@
 require "sinatra/json"
 
 module Api
-  class << self
-    def redis
-      @@redis
-    end
-
-    def redis=(server)
-      @@redis = if server.is_a?(String)
-                  uri = URI.parse(server)
-                  Redis.new(host: uri.host, port: uri.port, password: uri.password)
-                else
-                  server
-                end
-    end
-  end
-
   class Application < Sinatra::Base
+    helpers do
+      def list_uuid(params)
+        "list-" + params.fetch(:list_uuid, params["list_uuid"])
+      end
+
+      def redis
+        @redis ||= Redis.new(url: ENV["REDIS_URL"])
+      end
+    end
+
     get "/" do
-      json( {
-        mykey: Api.redis.get("mykey"),
-      })
+      "api"
+    end
+
+    get "/lists/:list_uuid/todos" do
+      list = list_uuid(params)
+      items = redis.get(list)
+
+      items
+    end
+
+    post "/lists/:list_uuid/todos" do
+      list = list_uuid(params)
+      description = params[:description]
+
+      new_value = if redis.exists(list)
+                    JSON.parse(redis.get(list)) << params[:description]
+                  else
+                    [params[:description]]
+                  end
+
+      redis.set(list, JSON.dump(new_value))
+
+      redis.get(list)
     end
   end
 end

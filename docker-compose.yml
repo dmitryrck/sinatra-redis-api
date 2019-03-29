@@ -17,7 +17,7 @@ services:
       - BUNDLE_APP_CONFIG=/app/.bundle
       - REDIS_URL=redis://redis:6379
     working_dir: /app
-    command: puma
+    command: puma -p 3000
     ports:
       - 3000:3000
     depends_on:
