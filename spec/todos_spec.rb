@@ -52,6 +52,19 @@ describe Api::Application do
     end
   end
 
+  context "DELETE /lists/1234/todos/12" do
+    it "should be able to update done" do
+      redis.set("list-1234", %[[12]])
+      redis.set("todo-12", JSON.dump("uuid" => 12, "description" => "Item#1", "done" => false))
+
+      delete "/lists/1234/todos/12"
+
+      expect(last_response.status).to eq 200
+
+      expect(redis.exists("todo-12")).to eq false
+    end
+  end
+
   context "POST /lists/1234/todos" do
     it "should create if list does not exist" do
       redis.del("list-1234")

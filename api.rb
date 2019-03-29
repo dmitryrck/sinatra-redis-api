@@ -41,6 +41,18 @@ module Api
       redis.set("todo-#{item[:uuid]}", JSON.dump(item))
     end
 
+    delete "/lists/:list_uuid/todos/:todo_uuid" do
+      list = list_uuid(params)
+      todo_uuids = if redis.exists(list)
+                     JSON.parse(redis.get(list)) - [params[:todo_uuid]]
+                   else
+                     []
+                   end
+
+      redis.del("todo-#{params[:todo_uuid]}")
+      redis.set(list, todo_uuids)
+    end
+
     post "/lists/:list_uuid/todos" do
       list = list_uuid(params)
 
