@@ -3,6 +3,8 @@
 source "https://rubygems.org"
 
 gem "sinatra"
+gem "sinatra-contrib"
+gem "redis"
 
 group :development, :test do
   gem "rspec"

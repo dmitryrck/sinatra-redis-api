@@ -5,4 +5,6 @@ Bundler.require :default
 
 require File.dirname(__FILE__)+"/api"
 
-run Api::Application
+Api.redis = ENV["REDIS_URL"]
+
+run Api::Application.new

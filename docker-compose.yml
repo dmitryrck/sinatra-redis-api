@@ -15,6 +15,7 @@ services:
       - bundle_path:/usr/local/bundle
     environment:
       - BUNDLE_APP_CONFIG=/app/.bundle
+      - REDIS_URL=redis://redis:6379
     working_dir: /app
     command: puma
     ports:
