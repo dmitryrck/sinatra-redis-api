@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  redis:
+    image: redis
+    expose:
+      - "6379"
+    volumes:
+      - redis:/data
+
+  app:
+    image: dmitryrck/ruby
+    volumes:
+      - .:/app
+      - bundle_path:/usr/local/bundle
+    environment:
+      - BUNDLE_APP_CONFIG=/app/.bundle
+    working_dir: /app
+    command: puma
+    ports:
+      - 3000:3000
+    depends_on:
+      - "redis"
+
+volumes:
+  bundle_path:
+  redis:
