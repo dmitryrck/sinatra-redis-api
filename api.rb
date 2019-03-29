@@ -18,24 +18,40 @@ module Api
 
     get "/lists/:list_uuid/todos" do
       list = list_uuid(params)
-      items = redis.get(list)
+      items = if redis.exists(list)
+                JSON.parse(redis.get(list)).map do |item_uuid|
+                  JSON.parse(redis.get("todo-#{item_uuid}"))
+                end
+              else
+                []
+              end
 
-      items
+      json items
     end
 
     post "/lists/:list_uuid/todos" do
       list = list_uuid(params)
-      description = params[:description]
 
-      new_value = if redis.exists(list)
-                    JSON.parse(redis.get(list)) << params[:description]
-                  else
-                    [params[:description]]
-                  end
+      item = {
+        uuid: params[:uuid].to_i,
+        description: params[:description],
+        done: !!params.fetch(:done) { false },
+      }
 
-      redis.set(list, JSON.dump(new_value))
+      todo_uuids = if redis.exists(list)
+                     JSON.parse(redis.get(list)) << item[:uuid]
+                   else
+                     [item[:uuid]]
+                   end
 
-      redis.get(list)
+      redis.set(list, JSON.dump(todo_uuids))
+      redis.set("todo-#{item[:uuid]}", JSON.dump(item))
+
+      items = todo_uuids.map do |item_uuid|
+                JSON.parse(redis.get("todo-#{item_uuid}"))
+              end
+
+      json items
     end
   end
 end
