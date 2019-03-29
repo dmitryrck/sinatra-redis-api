@@ -29,6 +29,18 @@ module Api
       json items
     end
 
+    put "/lists/:list_uuid/todos/:todo_uuid" do
+      current = JSON.parse(redis.get("todo-#{params[:todo_uuid]}"))
+
+      item = {
+        uuid: params[:todo_uuid].to_i,
+        description: params.fetch(:description) { current["description"] },
+        done: !!params.fetch(:done) { current["done"] },
+      }
+
+      redis.set("todo-#{item[:uuid]}", JSON.dump(item))
+    end
+
     post "/lists/:list_uuid/todos" do
       list = list_uuid(params)
 

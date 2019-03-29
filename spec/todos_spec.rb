@@ -24,6 +24,34 @@ describe Api::Application do
     end
   end
 
+  context "PUT /lists/1234/todos/1" do
+    it "should be able to update description" do
+      redis.set("list-1234", %[[10]])
+      redis.set("todo-10", JSON.dump("uuid" => 10, "description" => "Item#1", "done" => false))
+
+      put "/lists/1234/todos/10", { description: "Item#2" }
+
+      expect(last_response.status).to eq 200
+
+      expect(JSON.parse(redis.get("todo-10"))).to eq(
+        { "uuid" => 10, "description" => "Item#2", "done" => false },
+      )
+    end
+
+    it "should be able to update done" do
+      redis.set("list-1234", %[[11]])
+      redis.set("todo-11", JSON.dump("uuid" => 11, "description" => "Item#1", "done" => false))
+
+      put "/lists/1234/todos/11", { done: true }
+
+      expect(last_response.status).to eq 200
+
+      expect(JSON.parse(redis.get("todo-11"))).to eq(
+        { "uuid" => 11, "description" => "Item#1", "done" => true },
+      )
+    end
+  end
+
   context "POST /lists/1234/todos" do
     it "should create if list does not exist" do
       redis.del("list-1234")
