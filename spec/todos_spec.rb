@@ -46,7 +46,7 @@ describe Api::Application do
       expect(last_response.status).to eq 200
 
       expect(JSON.parse(redis.get("todo-10"))).to eq(
-        { "uuid" => 10, "description" => "Item#2", "done" => false },
+        { "uuid" => "10", "description" => "Item#2", "done" => false },
       )
     end
 
@@ -59,7 +59,7 @@ describe Api::Application do
       expect(last_response.status).to eq 200
 
       expect(JSON.parse(redis.get("todo-11"))).to eq(
-        { "uuid" => 11, "description" => "Item#1", "done" => true },
+        { "uuid" => "11", "description" => "Item#1", "done" => true },
       )
     end
   end

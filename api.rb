@@ -48,7 +48,7 @@ module Api
       current = JSON.parse(settings.redis.get("todo-#{params[:todo_uuid]}"))
 
       item = {
-        uuid: params[:todo_uuid].to_i,
+        uuid: params[:todo_uuid],
         description: params.fetch(:description) { current["description"] },
         done: !!params.fetch(:done) { current["done"] },
       }
