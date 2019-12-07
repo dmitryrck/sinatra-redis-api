@@ -23,15 +23,38 @@ describe Api::Application do
       ])
     end
 
+    it "returns its items (when using uuid)" do
+      redis.set(
+        "list-092cce4d-da92-4639-b20a-cdee3b342619",
+        ["1aab6f86-be3f-43ff-b3f6-207185b9db77", "10dd9e91-943b-433a-b01d-50783eec285c"],
+      )
+      redis.set(
+        "todo-1aab6f86-be3f-43ff-b3f6-207185b9db77",
+        JSON.dump(uuid: "1aab6f86-be3f-43ff-b3f6-207185b9db77", description: "item#3", done: false),
+      )
+      redis.set(
+        "todo-10dd9e91-943b-433a-b01d-50783eec285c",
+        JSON.dump(uuid: "10dd9e91-943b-433a-b01d-50783eec285c", description: "item#4", done: true),
+      )
+
+      get "/lists/092cce4d-da92-4639-b20a-cdee3b342619/todos"
+
+      expect(JSON.parse(last_response.body)).to match_array([
+        { "uuid" => "1aab6f86-be3f-43ff-b3f6-207185b9db77", "description" => "item#3", "done" => false },
+        { "uuid" => "10dd9e91-943b-433a-b01d-50783eec285c", "description" => "item#4", "done" => true },
+      ])
+    end
+
+
     it "should not return deleted items" do
       redis.set("list-1234", %[[10, 20]])
       redis.del("todo-10")
-      redis.set("todo-20", JSON.dump(uuid: 20, description: "item#2", done: true))
+      redis.set("todo-20", JSON.dump(uuid: "20", description: "item#2", done: true))
 
       get "/lists/1234/todos"
 
       expect(JSON.parse(last_response.body)).to match_array([
-        { "uuid" => 20, "description" => "item#2", "done" => true },
+        { "uuid" => "20", "description" => "item#2", "done" => true },
       ])
     end
   end
@@ -86,9 +109,9 @@ describe Api::Application do
 
       expect(last_response.status).to eq 200
 
-      expect(redis.get("list-1234")).to eq %[[3]]
+      expect(redis.get("list-1234")).to eq %[["3"]]
       expect(JSON.parse(redis.get("todo-3"))).to match_array(
-        { "uuid" => 3, "description" => "Item#1", "done" => false },
+        { "uuid" => "3", "description" => "Item#1", "done" => false },
       )
     end
 
@@ -100,14 +123,14 @@ describe Api::Application do
 
       expect(last_response.status).to eq 200
 
-      expect(redis.get("list-1234")).to eq %[[4]]
+      expect(redis.get("list-1234")).to eq %[["4"]]
       expect(JSON.parse(redis.get("todo-4"))).to match_array(
-        { "uuid" => 4, "description" => "Item#1", "done" => false },
+        { "uuid" => "4", "description" => "Item#1", "done" => false },
       )
     end
 
     it "should create if list already exists with one item" do
-      redis.set("list-1234", %[[5]])
+      redis.set("list-1234", [5])
       redis.set("todo-5", JSON.dump("uuid" => 5, "description" => "Item#1", "done" => false))
       redis.del("todo-6")
 
@@ -115,12 +138,12 @@ describe Api::Application do
 
       expect(last_response.status).to eq 200
 
-      expect(redis.get("list-1234")).to eq %[[5,6]]
+      expect(redis.get("list-1234")).to eq %[[5,"6"]]
       expect(JSON.parse(redis.get("todo-5"))).to eq(
         { "uuid" => 5, "description" => "Item#1", "done" => false },
       )
       expect(JSON.parse(redis.get("todo-6"))).to eq(
-        { "uuid" => 6, "description" => "Item#2", "done" => false },
+        { "uuid" => "6", "description" => "Item#2", "done" => false },
       )
     end
 
@@ -137,7 +160,7 @@ describe Api::Application do
 
       expect(JSON.parse(last_response.body)).to match_array([
         { "uuid" => 7, "description" => "Item#1", "done" => false },
-        { "uuid" => 8, "description" => "Item#2", "done" => true },
+        { "uuid" => "8", "description" => "Item#2", "done" => true },
       ])
     end
   end

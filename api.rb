@@ -72,7 +72,7 @@ module Api
       list = list_uuid(params)
 
       item = {
-        uuid: params[:uuid].to_i,
+        uuid: params[:uuid],
         description: params[:description],
         done: !!params.fetch(:done) { false },
       }
