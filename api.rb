@@ -87,10 +87,12 @@ module Api
       settings.redis.set("todo-#{item[:uuid]}", JSON.dump(item))
 
       items = todo_uuids.map do |item_uuid|
-                JSON.parse(settings.redis.get("todo-#{item_uuid}"))
+                if settings.redis.exists("todo-#{item_uuid}")
+                  JSON.parse(settings.redis.get("todo-#{item_uuid}"))
+                end
               end
 
-      json items
+      json items.reject { |item| item.nil? }
     end
   end
 end

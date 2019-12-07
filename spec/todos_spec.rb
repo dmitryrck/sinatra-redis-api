@@ -163,5 +163,23 @@ describe Api::Application do
         { "uuid" => "8", "description" => "Item#2", "done" => true },
       ])
     end
+
+    it "does not return expired items" do
+      redis.set("list-1234", %[[6,7]])
+      redis.del("todo-6")
+      redis.set("todo-7", JSON.dump("uuid" => 7, "description" => "Item#1", "done" => false))
+      redis.del("todo-8")
+
+      post "/lists/1234/todos", { "uuid" => 8, "description" => "Item#2", "done" => true }
+
+      expect(last_response.status).to eq 200
+
+      get "/lists/1234/todos"
+
+      expect(JSON.parse(last_response.body)).to match_array([
+        { "uuid" => 7, "description" => "Item#1", "done" => false },
+        { "uuid" => "8", "description" => "Item#2", "done" => true },
+      ])
+    end
   end
 end
