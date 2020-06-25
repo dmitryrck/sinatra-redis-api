@@ -9,7 +9,7 @@ GEM
     json (2.2.0)
     multi_json (1.13.1)
     mustermann (1.0.3)
-    puma (3.12.4)
+    puma (3.12.6)
     rack (2.2.3)
     rack-contrib (2.1.0)
       rack (~> 2.0)
