@@ -1,6 +1,3 @@
-[![Maintainability](https://api.codeclimate.com/v1/badges/03036e914510d4015a2f/maintainability)](https://codeclimate.com/github/dmitryrck/sinatra-redis-api/maintainability)<Paste>
-[![Test Coverage](https://api.codeclimate.com/v1/badges/03036e914510d4015a2f/test_coverage)](https://codeclimate.com/github/dmitryrck/sinatra-redis-api/test_coverage)
-
 # sinatra-redis-api
 
 This is an example REST API using sinatra and redis.
